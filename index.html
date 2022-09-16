@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WEATHER TEMPLATE</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        body {
+            width: 100%;
+            min-height: 100vh;
+            background: radial-gradient(circle farthest-side at center, #9AC1D9, #083359);
+            margin: 30px;
+            display: flex;
+            /* justify-content: center; */
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .title {
+            width: 50%;
+            height: 80px;
+            border-bottom: 3px solid beige;
+            display: flex;
+            justify-content: center;
+            font-size: 40px;
+            color: beige;
+            margin-top: 50px;
+            letter-spacing: 5px;
+        }
+
+        nav {
+            width: 60%;
+            height: 80px;
+            display: flex;
+            justify-content: center;
+            color: beige;
+            margin-top: 30px;
+
+
+        }
+
+        .btn {
+
+            padding: 20px;
+            font-size: 30px;
+            border-radius: 30px;
+            border: 1px solid white;
+            margin: 0 5px;
+            background-color: white;
+            color: #083359;
+            cursor: pointer;
+        }
+
+        .city_list {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            align-items: flex-start;
+            /* width: 800px;
+            height: calc(100vh - 50px); */
+            /* flex-direction: column; */
+            justify-content: center;
+        }
+
+        .city_card {
+            width: 500px;
+            height: 600px;
+            background-color: #d9dbda;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 25px;
+            border-radius: 30px;
+            font-size: 30px;
+
+            color: #083359;
+            margin-top: 60px;
+        }
+
+        .card_title {
+            margin-top: 20px;
+            margin-bottom: 20px
+        }
+
+        .card_text {
+            justify-content: space-evenly;
+            margin-top: 20px;
+            font-size: 40px;
+
+        }
+
+        .city_card img {
+            width: 300px;
+            /* height: 100px; */
+            border-radius: 10%;
+            background-color: #083359;
+            
+        }
+    </style>
+</head>
+
+<body>
+    <div class="title"> WEATHER TEMPLATE</div>
+    <nav>
+        <div class="btn radius" onclick="filter1('all')">全臺</div>
+        <div class="btn radius" onclick="filter1(north)">北部地區</div>
+        <div class="btn radius" onclick="filter1(center)">中部地區</div>
+        <div class="btn radius" onclick="filter1(south)">南部地區</div>
+        <div class="btn radius" onclick="filter1(east)">東部地區</div>
+        <div class="btn radius" onclick="filter1(island)">離島地區</div>
+        <!-- <button>全區</button>
+        <button>北部區域</button>
+        <button>中部區域</button>
+        <button>南部區域</button>
+        <button>東部區域</button>
+        <button>福建省</button> -->
+    </nav>
+    <div class="city_list">
+        <!-- <div class="city_card">
+            <p><span id="city_name"></span></p>
+            <img src="" alt="" class="radius">
+            <div class="card_text">
+                <p>最高溫度<span id="hitmp"></span></p>
+                <p>最低溫度<span id="lowtmp"></span></p>
+                <p>下雨機率<span id="rain"></span></p>
+                <p>舒適度<span id="confortable"></span></p>
+            </div>
+
+
+        </div> -->
+    </div>
+
+
+    <script>
+
+        const container = document.querySelector('.city_list');
+        const btn = document.querySelectorAll('.btn')
+        const north = ['臺北市', '新北市', '基隆市', '新竹市', '桃園市', '新竹縣', '宜蘭縣']
+        const center = ['臺中市', '苗栗縣', '彰化縣', '南投縣', '雲林縣']
+        const south = ['高雄市', '臺南市', '嘉義市', '嘉義縣', '屏東縣', '澎湖縣']
+        const east = ['花蓮縣', '臺東縣']
+        const island = ['金門縣', '連江縣']
+        // 北部區域：包括臺北市(5)、新北市(1)、基隆市(18)、新竹市(4)、桃園市(13)、新竹縣(3)及宜蘭縣(7)。
+        // 中部區域：包括臺中市(11)、苗栗縣(8)、彰化縣(20)、南投縣(14)及雲林縣(9)。
+        // 南部區域：包括高雄市(15)、臺南市(6)、嘉義市(2)、嘉義縣(0)、屏東縣(17)及澎湖縣(19)。
+        // 東部區域：包括花蓮縣(10)及臺東縣(12)。
+        // 福建省：包括金門縣(16)與連江縣(21)。
+
+        fetch('https://opendata.cwb.gov.tw/api/v1/rest/datastore/F-C0032-001?Authorization=CWB-AA300EC1-31BA-465E-B669-6CA2C320A195')
+            .then(function (response) {
+                return response.json();
+            })
+            .then(function (myJson) {
+
+                var locations = myJson.records.location
+
+                locations.forEach(element => {
+
+
+                    // for (let index = 0; index < locations.length; index++) {
+
+                    let city_name = element.locationName
+                    let hitmp = element.weatherElement[2].time[0].parameter.parameterName
+                    let lowtmp = element.weatherElement[4].time[0].parameter.parameterName
+                    let rain = element.weatherElement[1].time[0].parameter.parameterName
+                    let confortable = element.weatherElement[3].time[0].parameter.parameterName
+
+
+
+                    let img_path
+
+                    if (rain < 15) {
+                        img_path = './img/大晴天.gif'
+                    } else if (rain <= 20) {
+                        img_path = './img/晴天.gif'
+                    } else if (rain <= 30) {
+                        img_path = './img/多雲時陰.gif'
+                    } else if (rain <= 40) {
+                        img_path = './img/多雲短暫雨.gif'
+                    } else if (rain <= 50) {
+                        img_path = './img/多雲雷陣雨.gif'
+                    } else {
+                        img_path = './img/颱風.gif'
+                    }
+
+                    container.innerHTML += `
+                  <div class="city_card" data-city="${city_name}">
+                  <h2 class="card_title"> ${city_name}</h2>
+                  <img src="${img_path}" alt="" class="radius">
+                  <div class="card_text">
+                  <p>溫度: ${hitmp}℃~${lowtmp}℃</p>
+                  <p>降雨機率: ${rain}%</p>
+                  <p>舒適度: ${confortable}</p>
+                  </div> </div> 
+                  `
+
+                });
+            });
+
+
+
+
+        //     <img src="./img/多雲時陰.gif" alt="">
+        // <img src="./img/多雲短暫雨.gif" alt="">
+        // <img src="./img/多雲雷陣雨.gif" alt="">
+        // <img src="./img/大晴天.gif" alt="">
+        // <img src="./img/晴天.gif" alt="">
+        // <img src="./img/颱風.gif" alt="">
+        // myJson.records.location[5].locationName
+
+
+
+        //把所有縣市印出來，然後把不想看到的加上display:none
+        function filter1(areas) {
+            var allcity = document.querySelectorAll('.city_card')
+
+            allcity.forEach(city => {
+
+                if (areas == 'all') {
+                    city.style.display = 'flex'
+                } else {
+                    city.style.display = 'none'
+                    areas.forEach(area => {
+                        if (city.dataset.city == area) {
+                            city.style.display = 'flex'
+
+                        }
+
+                    })
+                }
+            });
+        }
+
+
+
+    function filter2(areas) {
+        
+    }
+    </script>
+
+</body>
+
+</html>
